@@ -1,33 +1,41 @@
-version: "3"
+version: '3'
 
 services:
   php-apache:
-    container_name: "${CONTAINER_NAME_PREFIX}-apache-php"
+    container_name: '${CONTAINER_NAME_PREFIX}-apache-php'
     build: .
     volumes:
-    - ${PATH_TO_SYMFONY_PROJECT}:/var/www/html
+      - '${PATH_TO_SYMFONY_PROJECT}:/var/www/html'
     ports:
-    - "80:80"
+      - '8400:80'
 
-db:
-  container_name: "${CONTAINER_NAME_PREFIX}-mysql"
-  image: mysql:8.0
-  restart: always
-  environment:
-    - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
-    - MYSQL_DATABASE=${DB_NAME}
-    - MYSQL_USER=${DB_USER}
-    - MYSQL_PASSWORD=${DB_PASSWORD}
-  volumes:
-    - db:/var/lib/mysql
-  ports:
-    - "3306:3306"
+  mysql:
+    container_name: '${CONTAINER_NAME_PREFIX}-mysql'
+    image: 'mysql:8.0'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: '${ROOT_PASSWORD}'
+      MYSQL_DATABASE: '${DB_NAME}'
+      MYSQL_USER: '${DB_USER}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      TZ: Europe/Berlin
+    volumes:
+      - 'db:/var/lib/mysql'
+    ports:
+      - '3306:3306'
 
-adminer:
-  container_name: "${CONTAINER_NAME_PREFIX}-adminer"
-  image: adminer
-  ports:
-    - "8080:8080"
+  phpmyadmin:
+    image: 'phpmyadmin/phpmyadmin:latest'
+    container_name: '${CONTAINER_NAME_PREFIX}-phpmyadmin'
+    environment:
+      UPLOAD_LIMIT: 300M
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      TZ: Europe/Berlin
+    ports:
+      - '8081:80'
+    links:
+      - mysql
 
 volumes:
-  db:
+  db: null
